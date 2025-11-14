@@ -111,7 +111,7 @@ washington_post =
 
 This dataset includes the number of homicides in various cities throughout the US. The data includes the date of the incident (`reported_date`), the victims' names (`victims_last`, `victims_first`), the race of the victim (`victim_race`), the age of the victim (`victim_age`), the sex of the victim (`victim_sex`), the location of the incident (`city`, `state`, `lat`, `lon`), and the perpetrator's disposition (`disposition`). 
 
-Create `city_state` variable
+##### Create `city_state` variable
 
 ```{r}
 washington_post =
@@ -121,7 +121,7 @@ washington_post =
   )
 ```
 
-Summarize total homicides and number of unsolved cases in each city
+##### Summarize total homicides and number of unsolved cases in each city
 
 ```{r}
 washington_post |> 
@@ -130,10 +130,24 @@ washington_post |>
     total_homicides = n(),
     unsolved_cases = sum(unsolved)
   ) |> 
+  head(10) |> 
   knitr::kable()
 ```
 
+##### Calculate proportion of unsolved homicides in Baltimore, MD
 
+```{r}
+washington_post |> 
+  filter(city_state == "Baltimore, MD")
+
+x = sum(washington_post$unsolved)
+n = nrow(washington_post)
+
+prop.test(x, n) |> 
+  broom::tidy() |> 
+  select(estimate, conf.low, conf.high) |> 
+  knitr::kable()
+```
 
 
 
