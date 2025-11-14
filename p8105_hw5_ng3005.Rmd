@@ -169,5 +169,29 @@ washington_post |>
   knitr::kable()
 ```
 
+##### Plot showing estimates and CIs for each city
 
+```{r}
+washington_post |> 
+  group_by(city_state) |> 
+  summarize(
+    x = sum(unsolved, na.rm = TRUE),
+    n = n()
+  ) |>  
+  mutate(
+    test = map2(x, n, ~prop.test(.x, .y)),
+    tidy = map(test, broom::tidy)
+  ) |> 
+  unnest(tidy) |> 
+  ggplot(aes(x = reorder(city_state, estimate), y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) +
+  labs(
+    x = "City",
+    y = "Proportion of homicides unsolved",
+    title = "Estimated proportion of unsolved homicides by city",
+    caption = "Error bars indicate 95% confidence intervals"
+  ) +
+  theme(axis.text.x = element_text(angle = 90))
+```
 
