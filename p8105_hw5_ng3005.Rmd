@@ -9,6 +9,7 @@ output: github_document
 library(tidyverse)
 library(rvest)
 library(broom)
+library(purrr)
 ```
 
 
@@ -149,6 +150,24 @@ prop.test(x, n) |>
   knitr::kable()
 ```
 
+##### Calculate proportion of unsolved homicides in all cities
+
+```{r, message = FALSE}
+washington_post |> 
+  group_by(city_state) |> 
+  summarize(
+    x = sum(unsolved, na.rm = TRUE), 
+    n = n()
+  ) |> 
+  mutate(
+    test = map2(x, n, ~prop.test(.x, .y)),
+    tidy = map(test, broom::tidy)
+  ) |> 
+  unnest(tidy) |> 
+  select(city_state, x, n, estimate, conf.low, conf.high) |> 
+  head(10) |> 
+  knitr::kable()
+```
 
 
 
